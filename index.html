@@ -136,6 +136,11 @@
           <i id="iconSyncSpinner" class="fa-solid fa-cloud-arrow-down text-xs"></i>
           <span id="textSyncStatus">Sinkron Spreadsheet</span>
         </button>
+        <!-- Tombol Khusus Admin: Kirim 48 Data Awal ke Spreadsheet -->
+        <button onclick="exportDataToSpreadsheet()" title="Kirim/Inisialisasi 48 data kontrak lokal ke Google Spreadsheet" class="admin-only hidden flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-semibold transition">
+          <i id="iconUploadSpinner" class="fa-solid fa-cloud-arrow-up text-xs"></i>
+          <span>Isi Data ke Spreadsheet</span>
+        </button>
         <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Live Linkage Opsi A Aktif</span>
       </div>
     </div>
@@ -1123,8 +1128,22 @@
       if (textStatus) textStatus.textContent = 'Menghubungkan...';
 
       try {
-        const response = await fetch(SPREADSHEET_API_URL);
+        const response = await fetch(SPREADSHEET_API_URL, {
+          method: "GET",
+          headers: { "Accept": "application/json" }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error ${response.status}: Periksa hak akses Web App di Google Apps Script (Pastikan 'Anyone').`);
+        }
+
         const result = await response.json();
+
+        if (result.status === "ERROR") {
+          throw new Error(result.message || "Error saat mengeksekusi Apps Script");
+        }
+
+        let loadedCount = 0;
 
         // 1. Muat Data KR jika sheet DATA_KR ada isinya
         if (result.kr && Array.isArray(result.kr) && result.kr.length > 0) {
@@ -1159,6 +1178,7 @@
             } else {
               currentData.push(mapped);
             }
+            loadedCount++;
           });
         }
 
@@ -1215,12 +1235,54 @@
 
         syncOpsiADelivery();
         populateUP3Options();
-        showToast("Sinkronisasi Google Spreadsheet berhasil!", "success");
+
+        if (loadedCount > 0) {
+          showToast(`Sinkronisasi berhasil! ${loadedCount} data dimuat dari Spreadsheet.`, "success");
+        } else {
+          showToast("Terhubung ke Spreadsheet! Lembar kerja masih kosong (menggunakan data lokal). Klik 'Isi Data ke Spreadsheet' untuk mengisinya.", "info");
+        }
       } catch (err) {
-        console.warn("Koneksi Spreadsheet belum merespons, menggunakan database lokal aktif:", err);
+        console.warn("Detail kendala koneksi Spreadsheet:", err);
+        showToast(`Gagal sinkron: ${err.message}. Pastikan izin Web App 'Anyone' dan deploy versi baru.`, "error");
       } finally {
         if (spinner) spinner.classList.remove('fa-spin');
         if (textStatus) textStatus.textContent = 'Sinkron Spreadsheet';
+      }
+    }
+
+    // FUNGSI MENGIRIM / MENGISI 48 DATA KR KE SPREADSHEET KOSONG (KHUSUS ADMIN)
+    async function exportDataToSpreadsheet() {
+      if (currentUser.role !== 'admin') {
+        showToast("Hanya Administrator yang dapat mengisi data ke Spreadsheet!", "error");
+        return;
+      }
+
+      const spinner = document.getElementById('iconUploadSpinner');
+      if (spinner) spinner.classList.add('fa-spin');
+      showToast("Sedang mengirim 48 data KR ke Google Spreadsheet...", "info");
+
+      try {
+        const payload = {
+          action: "SEED_KR",
+          data: currentData
+        };
+
+        const res = await fetch(SPREADSHEET_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        const json = await res.json();
+        if (json.status === "SUCCESS") {
+          showToast(`Sukses! ${json.count || 48} data kontrak berhasil ditulis ke Spreadsheet Anda.`, "success");
+        } else {
+          showToast("Gagal menyimpan ke Spreadsheet: " + (json.message || "Unknown"), "error");
+        }
+      } catch (err) {
+        showToast("Gagal mengirim data: " + err.message + ". Pastikan Apps Script memiliki fungsi doPost dan di-deploy versi baru.", "error");
+      } finally {
+        if (spinner) spinner.classList.remove('fa-spin');
       }
     }
 
