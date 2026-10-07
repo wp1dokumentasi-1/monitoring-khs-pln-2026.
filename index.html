@@ -848,6 +848,41 @@
     </div>
   </div>
 
+  <!-- MODAL KONFIRMASI HAPUS KR (KEAMANAN DATA ADMIN) -->
+  <div id="modalKonfirmasiHapusKR" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-sm text-slate-800 dark:text-white">Konfirmasi Penghapusan Kontrak</h3>
+          <p class="text-[11px] text-slate-500">Peringatan: Tindakan ini memerlukan persetujuan Admin</p>
+        </div>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 space-y-1.5 text-xs">
+        <p class="text-slate-600 dark:text-slate-300 font-medium">Apakah Anda yakin ingin menghapus data Kontrak Rinci berikut dari sistem?</p>
+        <div class="font-mono font-bold text-rose-700 dark:text-rose-300 break-all text-xs" id="labelHapusNoKR">-</div>
+        <div class="text-[11px] text-slate-500 font-semibold" id="labelHapusDetail">-</div>
+      </div>
+
+      <p class="text-[11px] text-slate-400 italic">
+        * Penghapusan akan otomatis memotong kuota terkait, disinkronkan ke Google Spreadsheet, dan dicatat pada Riwayat Aktivitas.
+      </p>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-800 text-xs">
+        <button type="button" onclick="closeModalKonfirmasiHapusKR()" class="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+          Batal
+        </button>
+        <button type="button" onclick="eksekusiHapusKR()" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold flex items-center gap-1.5 shadow-sm transition">
+          <i class="fa-solid fa-trash text-xs"></i>
+          <span>Ya, Hapus Kontrak</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL CATAT SURAT JALAN / DELIVERY ORDER (DO) -->
   <div id="modalFormDO" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
     <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
@@ -2585,16 +2620,38 @@
       autoSyncToSpreadsheet(id ? "Edit Kontrak KR" : "Input KR Baru");
     }
 
+    let krIdToDelete = null;
+
     function hapusKR(id) {
       if (currentUser.role !== 'admin') return;
       const item = databaseKR.find(k => k.id === id);
       if (!item) return;
 
+      krIdToDelete = id;
+      document.getElementById('labelHapusNoKR').textContent = item.no_kr;
+      document.getElementById('labelHapusDetail').textContent = `Wilayah ${item.wilayah} - UP3 ${item.up3} | NPP: ${item.npp} | Nilai: Rp ${Number(item.nilai_total).toLocaleString('id-ID')}`;
+      document.getElementById('modalKonfirmasiHapusKR').classList.remove('hidden');
+    }
+
+    function closeModalKonfirmasiHapusKR() {
+      krIdToDelete = null;
+      document.getElementById('modalKonfirmasiHapusKR').classList.add('hidden');
+    }
+
+    function eksekusiHapusKR() {
+      if (!krIdToDelete || currentUser.role !== 'admin') return;
+      const item = databaseKR.find(k => k.id === krIdToDelete);
+      if (!item) {
+        closeModalKonfirmasiHapusKR();
+        return;
+      }
+
       const noKR = item.no_kr;
       const up3KR = item.up3;
 
-      databaseKR = databaseKR.filter(k => k.id !== id);
-      showToast(`Kontrak ${item.no_kr} berhasil dihapus dari sistem.`, "info");
+      databaseKR = databaseKR.filter(k => k.id !== krIdToDelete);
+      showToast(`Kontrak ${noKR} berhasil dihapus dari sistem.`, "info");
+      closeModalKonfirmasiHapusKR();
       updateTimestampUI();
       populateFilterUP3Dropdown();
       syncOpsiADelivery();
