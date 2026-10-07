@@ -727,8 +727,23 @@
             </select>
           </div>
           <div>
-            <label class="block font-bold mb-1">Unit UP3 *</label>
-            <select id="formKR_up3" required class="w-full p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-semibold"></select>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block font-bold">Unit UP3 *</label>
+              <!-- Pilihan Cepat 1 KR Multi-UP3 / Manual -->
+              <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] text-wika-700 dark:text-wika-400 font-bold bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition select-none" title="Aktifkan jika 1 KR mencakup lebih dari 1 UP3 (Multi-UP3) atau penamaan khusus">
+                <input type="checkbox" id="checkMultiUP3" onchange="toggleMultiUP3Mode()" class="rounded text-wika-600 focus:ring-wika-500 w-3 h-3">
+                <span>Multi-UP3 / Manual</span>
+              </label>
+            </div>
+            <!-- Mode 1: Dropdown UP3 Standar -->
+            <div id="boxUP3Dropdown">
+              <select id="formKR_up3" onchange="handleUP3DropdownChange()" class="w-full p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-semibold"></select>
+            </div>
+            <!-- Mode 2: Input Manual / Multi-UP3 Gabungan -->
+            <div id="boxUP3Manual" class="hidden">
+              <input type="text" id="formKR_up3_manual" placeholder="Contoh: BINJAI & LUBUK PAKAM" class="w-full p-2.5 rounded-lg border border-sky-300 dark:border-sky-700 bg-sky-50/50 dark:bg-sky-950/20 font-semibold text-slate-800 dark:text-slate-100">
+              <p class="text-[10px] text-slate-400 mt-1">Ketik nama unit gabungan (misal: <b>BINJAI &amp; LUBUK PAKAM</b>)</p>
+            </div>
           </div>
         </div>
 
@@ -1539,7 +1554,12 @@
 
       return databaseKR.filter(item => {
         if (currentFilterWilayah !== 'ALL' && item.wilayah !== currentFilterWilayah) return false;
-        if (up3Filter !== 'ALL' && item.up3 !== up3Filter) return false;
+        // Pengecekan Cerdas: Kontrak multi-UP3 (misal: "BINJAI & LUBUK PAKAM") tetap muncul saat salah satu UP3 difilter
+        if (up3Filter !== 'ALL') {
+          const itemUp3 = (item.up3 || '').toLowerCase();
+          const filterVal = up3Filter.toLowerCase();
+          if (!itemUp3.includes(filterVal)) return false;
+        }
         if (search) {
           const matchNo = item.no_kr.toLowerCase().includes(search);
           const matchUP3 = item.up3.toLowerCase().includes(search);
@@ -2502,15 +2522,78 @@
     function updateDropdownUP3Input(wilayahTerpilih = null, selectedUP3 = null) {
       const wil = wilayahTerpilih || document.getElementById('formKR_wilayah').value;
       const selUP3 = document.getElementById('formKR_up3');
+      const boxDropdown = document.getElementById('boxUP3Dropdown');
+      const boxManual = document.getElementById('boxUP3Manual');
+      const checkMulti = document.getElementById('checkMultiUP3');
+      const inputManual = document.getElementById('formKR_up3_manual');
+
       selUP3.innerHTML = '';
       const list = DATABASE_UP3[wil] || [];
       list.forEach(up3 => {
         const opt = document.createElement('option');
         opt.value = up3;
         opt.textContent = up3;
-        if (selectedUP3 && selectedUP3 === up3) opt.selected = true;
         selUP3.appendChild(opt);
       });
+
+      // Tambahkan opsi pemicu manual di pilihan terbawah dropdown
+      const optManual = document.createElement('option');
+      optManual.value = '__MANUAL__';
+      optManual.textContent = '+ Ketik Manual / 2 UP3 Gabungan...';
+      selUP3.appendChild(optManual);
+
+      if (selectedUP3) {
+        if (list.includes(selectedUP3)) {
+          selUP3.value = selectedUP3;
+          checkMulti.checked = false;
+          boxDropdown.classList.remove('hidden');
+          boxManual.classList.add('hidden');
+        } else {
+          // Kasus 1 KR 2 UP3 (Manual)
+          checkMulti.checked = true;
+          inputManual.value = selectedUP3;
+          selUP3.value = '__MANUAL__';
+          boxDropdown.classList.add('hidden');
+          boxManual.classList.remove('hidden');
+        }
+      } else {
+        checkMulti.checked = false;
+        inputManual.value = '';
+        boxDropdown.classList.remove('hidden');
+        boxManual.classList.add('hidden');
+      }
+    }
+
+    function toggleMultiUP3Mode() {
+      const isMulti = document.getElementById('checkMultiUP3').checked;
+      const boxDropdown = document.getElementById('boxUP3Dropdown');
+      const boxManual = document.getElementById('boxUP3Manual');
+      const inputManual = document.getElementById('formKR_up3_manual');
+      const selUP3 = document.getElementById('formKR_up3');
+
+      if (isMulti) {
+        boxDropdown.classList.add('hidden');
+        boxManual.classList.remove('hidden');
+        if (!inputManual.value && selUP3.value && selUP3.value !== '__MANUAL__') {
+          inputManual.value = selUP3.value + ' & ';
+        }
+        inputManual.focus();
+      } else {
+        boxDropdown.classList.remove('hidden');
+        boxManual.classList.add('hidden');
+        if (selUP3.value === '__MANUAL__') {
+          const list = DATABASE_UP3[document.getElementById('formKR_wilayah').value] || [];
+          if (list.length > 0) selUP3.value = list[0];
+        }
+      }
+    }
+
+    function handleUP3DropdownChange() {
+      const val = document.getElementById('formKR_up3').value;
+      if (val === '__MANUAL__') {
+        document.getElementById('checkMultiUP3').checked = true;
+        toggleMultiUP3Mode();
+      }
     }
 
     function toggleFormTipe2() {
@@ -2529,6 +2612,8 @@
       document.getElementById('boxFormTipe2').classList.add('hidden');
       const chk90 = document.getElementById('checkAuto90Hari');
       if (chk90) chk90.checked = false;
+      const chkMulti = document.getElementById('checkMultiUP3');
+      if (chkMulti) chkMulti.checked = false;
       updateDropdownUP3Input('ACEH');
       document.getElementById('modalFormKR').classList.remove('hidden');
     }
@@ -2579,11 +2664,28 @@
       const id = document.getElementById('formKR_id').value;
       const isEnable2 = document.getElementById('checkEnableTipe2').checked;
 
+      // Ambil nilai UP3: baik dari input manual maupun dropdown standar
+      const isMultiUP3 = document.getElementById('checkMultiUP3').checked;
+      let up3Value = '';
+      if (isMultiUP3) {
+        up3Value = document.getElementById('formKR_up3_manual').value.trim();
+        if (!up3Value) {
+          showToast("Silakan isi nama Unit UP3 terlebih dahulu!", "warning");
+          document.getElementById('formKR_up3_manual').focus();
+          return;
+        }
+      } else {
+        up3Value = document.getElementById('formKR_up3').value;
+        if (up3Value === '__MANUAL__') {
+          up3Value = document.getElementById('formKR_up3_manual').value.trim() || 'UP3 GABUNGAN';
+        }
+      }
+
       const record = {
         id: id || `KR-${Date.now()}`,
         wilayah: document.getElementById('formKR_wilayah').value,
         no_kr: document.getElementById('formKR_no_kr').value.trim(),
-        up3: document.getElementById('formKR_up3').value,
+        up3: up3Value,
         tgl_terima: document.getElementById('formKR_tgl_terima').value,
         tgl_akhir: document.getElementById('formKR_tgl_akhir').value,
         nilai_total: Number(document.getElementById('formKR_nilai_total').value) || 0,
