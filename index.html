@@ -44,6 +44,17 @@
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     .dark ::-webkit-scrollbar-thumb { background: #475569; }
 
+    /* Pengoptimalan Sentuh & Tampilan Mobile */
+    .touch-scroll {
+      -webkit-overflow-scrolling: touch;
+    }
+    @media (max-width: 640px) {
+      .table-mobile-compact td, .table-mobile-compact th {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+    }
+
     /* Efek Animasi Transisi */
     .fade-in { animation: fadeIn 0.2s ease-in-out; }
     @keyframes fadeIn {
@@ -85,34 +96,34 @@
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
   <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm no-print">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-auto sm:h-16 py-2.5 sm:py-0 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
       
       <!-- LOGO RESMI WIKA BETON (LANGSUNG DARI GOOGLE DRIVE) -->
-      <div class="flex items-center gap-3">
-        <div class="h-10 px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm flex items-center justify-center">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="h-9 sm:h-10 px-1.5 sm:px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm flex items-center justify-center shrink-0">
           <img id="brandLogoImg" 
                src="https://drive.google.com/thumbnail?id=1lc-GVGWBI-4bcH-WanrW8E3EUWKKLywj&sz=w1000" 
                alt="Logo WIKA BETON" 
-               class="h-8 max-w-[135px] object-contain"
+               class="h-7 sm:h-8 max-w-[100px] sm:max-w-[135px] object-contain"
                onerror="handleLogoFallback(this)">
           
-          <div id="brandLogoFallback" class="hidden flex items-center gap-1.5 font-black text-sm text-wika-600">
-            <span class="border-2 border-wika-600 rounded px-1 text-xs">WIKA</span>
+          <div id="brandLogoFallback" class="hidden flex items-center gap-1 font-black text-xs sm:text-sm text-wika-600">
+            <span class="border border-wika-600 rounded px-1 text-[10px]">WIKA</span>
             <span>BETON</span>
           </div>
         </div>
 
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-sm font-black tracking-wide text-wika-700 dark:text-wika-500 uppercase">Sales Area 1 Medan</h1>
-            <span class="text-[10px] bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 font-bold px-1.5 py-0.5 rounded border border-sky-200 dark:border-sky-800">KHS PLN 2026</span>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5 sm:gap-2">
+            <h1 class="text-xs sm:text-sm font-black tracking-wide text-wika-700 dark:text-wika-500 uppercase truncate">Sales Area 1 Medan</h1>
+            <span class="text-[9px] sm:text-[10px] bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 font-bold px-1.5 py-0.2 rounded border border-sky-200 dark:border-sky-800 shrink-0">2026</span>
           </div>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Monitoring Tiang Distribusi Beton UID Aceh & UID Sumut</p>
+          <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate max-w-[200px] xs:max-w-[260px] sm:max-w-none">Monitoring KHS UID Aceh &amp; Sumut</p>
         </div>
       </div>
 
       <!-- KANAN: STATUS SINKRONISASI, WAKTU UPDATE, AKUN PENGGUNA, DAN TEMA -->
-      <div class="flex items-center gap-2 sm:gap-3">
+      <div class="flex items-center gap-1.5 sm:gap-3 ml-auto sm:ml-0">
         <!-- Timestamp Pembaruan Terakhir -->
         <div class="hidden lg:flex flex-col text-right pr-2 border-r border-slate-200 dark:border-slate-800">
           <span class="text-[9px] uppercase font-bold tracking-wider text-slate-400">Update Terakhir:</span>
@@ -130,10 +141,10 @@
         </button>
 
         <!-- Akun Pengguna & Hak Akses (Viewer / Admin) -->
-        <div class="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-slate-800">
-          <div id="userProfileBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200">
-            <i id="userIconBadge" class="fa-solid fa-user text-slate-500"></i>
-            <span id="labelUserName">Viewer (Tamu)</span>
+        <div class="flex items-center gap-1.5 sm:gap-2 pl-1.5 sm:pl-2 border-l border-slate-200 dark:border-slate-800">
+          <div id="userProfileBadge" class="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200">
+            <i id="userIconBadge" class="fa-solid fa-user text-slate-500 text-xs"></i>
+            <span id="labelUserName" class="hidden xs:inline">Viewer (Tamu)</span>
             <span id="badgeUserRole" class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase">TAMU</span>
           </div>
 
@@ -154,24 +165,24 @@
 
   <!-- SUBHEADER DENGAN ID KHUSUS no-print AGAR TIDAK TERBAWA SAAT CETAK PDF -->
   <div id="subHeaderNav" class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 no-print">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-      <nav class="flex space-x-6 text-sm font-semibold">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center justify-between gap-1 sm:gap-2">
+      <nav class="flex space-x-4 sm:space-x-6 text-xs sm:text-sm font-semibold overflow-x-auto touch-scroll py-2 md:py-0">
         <!-- Tab 1: Data Kontrak KR (Terbuka untuk Semua) -->
-        <button onclick="switchTab('kr')" id="navTabKR" class="py-3 border-b-2 border-wika-600 text-wika-600 dark:text-wika-500 flex items-center gap-2">
+        <button onclick="switchTab('kr')" id="navTabKR" class="py-2.5 sm:py-3 border-b-2 border-wika-600 text-wika-600 dark:text-wika-500 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
           <i class="fa-solid fa-table-list"></i>
           <span>Data Kontrak KR</span>
           <span class="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded-full font-bold">48 KR</span>
         </button>
 
         <!-- Tab 2: Buku Kendali DO (KHUSUS ADMIN - TERSEMBUNYI UNTUK VIEWER) -->
-        <button onclick="switchTab('delivery')" id="navTabDelivery" class="hidden py-3 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center gap-2">
+        <button onclick="switchTab('delivery')" id="navTabDelivery" class="hidden py-2.5 sm:py-3 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
           <i class="fa-solid fa-truck-ramp-box"></i>
           <span>Buku Kendali DO</span>
           <span class="text-[10px] bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 px-1.5 py-0.5 rounded-full font-bold">Opsi A</span>
         </button>
 
         <!-- Tab 3: Kendala Lapangan (KHUSUS ADMIN - TERSEMBUNYI UNTUK VIEWER) -->
-        <button onclick="switchTab('kendala')" id="navTabKendala" class="hidden py-3 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center gap-2">
+        <button onclick="switchTab('kendala')" id="navTabKendala" class="hidden py-2.5 sm:py-3 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
           <i class="fa-solid fa-triangle-exclamation"></i>
           <span>Kendala Lapangan</span>
           <span id="badgeJumlahKendala" class="text-[10px] bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300 px-1.5 py-0.5 rounded-full font-bold">2</span>
@@ -179,27 +190,27 @@
       </nav>
 
       <!-- TOMBOL AKSI ATAS -->
-      <div class="flex items-center gap-2 py-2">
+      <div class="flex items-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 overflow-x-auto touch-scroll w-full md:w-auto">
         <!-- Tombol Cetak PDF Khusus Data Terpilih -->
-        <button onclick="printReportPDF()" title="Cetak Tabel Data KR Terpilih ke PDF" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 transition">
+        <button onclick="printReportPDF()" title="Cetak Tabel Data KR Terpilih ke PDF" class="shrink-0 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 transition">
           <i class="fa-solid fa-print text-wika-600 dark:text-wika-400"></i>
           <span>Cetak PDF</span>
         </button>
 
         <!-- Tombol Kirim Semua Data ke Spreadsheet (Khusus Admin) -->
-        <button onclick="exportAllToSpreadsheet()" id="btnActionExportCloud" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition">
+        <button onclick="exportAllToSpreadsheet()" id="btnActionExportCloud" class="hidden shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition">
           <i class="fa-solid fa-file-arrow-up"></i>
-          <span>Kirim Semua ke Spreadsheet</span>
+          <span>Kirim ke Spreadsheet</span>
         </button>
 
         <!-- Tombol Atur Kolom Viewer (Khusus Admin) -->
-        <button onclick="openModalKolomViewer()" id="btnActionAturKolom" class="hidden bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 text-xs font-bold px-3 py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 flex items-center gap-1.5 transition">
+        <button onclick="openModalKolomViewer()" id="btnActionAturKolom" class="hidden shrink-0 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 flex items-center gap-1.5 transition">
           <i class="fa-solid fa-table-columns"></i>
           <span>Atur Kolom Viewer</span>
         </button>
 
         <!-- Tombol Input KR Baru (Khusus Admin) -->
-        <button onclick="openModalTambahKR()" id="btnActionTambahKR" class="hidden bg-wika-600 hover:bg-wika-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition">
+        <button onclick="openModalTambahKR()" id="btnActionTambahKR" class="hidden shrink-0 bg-wika-600 hover:bg-wika-700 text-white text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition">
           <i class="fa-solid fa-plus-circle"></i>
           <span>Input KR Baru</span>
         </button>
@@ -301,21 +312,21 @@
     <div id="tabContentKR" class="space-y-4">
       
       <!-- TOOLBAR FILTER & PENCARIAN -->
-      <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 shadow-sm">
-        <div class="flex items-center gap-2 flex-wrap">
-          <div class="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-50 dark:bg-slate-800">
-            <button onclick="setFilterWilayah('ALL')" id="filterBtnAll" class="px-3 py-1 rounded-md text-xs font-bold bg-white dark:bg-slate-700 text-wika-700 dark:text-wika-400 shadow-sm transition">Semua Wilayah</button>
-            <button onclick="setFilterWilayah('ACEH')" id="filterBtnAceh" class="px-3 py-1 rounded-md text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">UID Aceh (29)</button>
-            <button onclick="setFilterWilayah('SUMUT')" id="filterBtnSumut" class="px-3 py-1 rounded-md text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">UID Sumut (19)</button>
+      <div class="bg-white dark:bg-slate-900 p-2.5 sm:p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-3 shadow-sm">
+        <div class="flex items-center gap-2 flex-wrap w-full md:w-auto">
+          <div class="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-50 dark:bg-slate-800 overflow-x-auto touch-scroll max-w-full">
+            <button onclick="setFilterWilayah('ALL')" id="filterBtnAll" class="px-2.5 sm:px-3 py-1 rounded-md text-xs font-bold bg-white dark:bg-slate-700 text-wika-700 dark:text-wika-400 shadow-sm transition whitespace-nowrap">Semua Wilayah</button>
+            <button onclick="setFilterWilayah('ACEH')" id="filterBtnAceh" class="px-2.5 sm:px-3 py-1 rounded-md text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap">UID Aceh (29)</button>
+            <button onclick="setFilterWilayah('SUMUT')" id="filterBtnSumut" class="px-2.5 sm:px-3 py-1 rounded-md text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap">UID Sumut (19)</button>
           </div>
 
-          <select id="selectFilterUP3" onchange="renderTableKR()" class="text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-700 dark:text-slate-200 focus:outline-none">
+          <select id="selectFilterUP3" onchange="renderTableKR()" class="text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-700 dark:text-slate-200 focus:outline-none flex-1 md:flex-initial">
             <option value="ALL">Semua Unit UP3</option>
           </select>
         </div>
 
-        <div class="flex items-center gap-2 w-full sm:w-auto">
-          <div class="relative w-full sm:w-64">
+        <div class="flex items-center gap-2 w-full md:w-auto">
+          <div class="relative w-full md:w-64">
             <i class="fa-solid fa-search absolute left-3 top-2.5 text-slate-400 text-xs"></i>
             <input type="text" id="searchInput" oninput="renderTableKR()" placeholder="Cari No. KR / NPP / UP3..." class="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-wika-500">
           </div>
@@ -323,7 +334,15 @@
       </div>
 
       <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
+        <!-- PANDUAN SENTUH GESER DI LAYAR HP -->
+        <div class="sm:hidden flex items-center justify-between px-3 py-1.5 bg-sky-50 dark:bg-sky-950/40 border-b border-sky-100 dark:border-sky-900/60 text-[10px] text-sky-700 dark:text-sky-300 font-medium">
+          <span class="flex items-center gap-1.5">
+            <i class="fa-solid fa-arrows-left-right text-sky-500"></i>
+            <span>Geser tabel ke samping untuk melihat seluruh data</span>
+          </span>
+          <span class="bg-sky-100 dark:bg-sky-900/60 px-1.5 py-0.2 rounded font-bold uppercase text-[9px]">48 Kontrak</span>
+        </div>
+        <div class="overflow-x-auto touch-scroll">
           <table class="w-full text-left text-xs border-collapse">
             <thead class="bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700">
               <tr>
@@ -721,11 +740,18 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label class="block font-bold mb-1">Tanggal Terima *</label>
-            <input type="date" id="formKR_tgl_terima" required class="w-full p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
+            <input type="date" id="formKR_tgl_terima" onchange="handleTanggalTerimaChange()" required class="w-full p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
           </div>
           <div>
-            <label class="block font-bold mb-1">Tanggal Akhir KR *</label>
-            <input type="date" id="formKR_tgl_akhir" required class="w-full p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
+            <div class="flex items-center justify-between mb-1">
+              <label class="block font-bold">Tanggal Akhir KR *</label>
+              <!-- TOMBOL CEKLIST AUTO 90 HARI DARI TANGGAL AWAL -->
+              <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] text-wika-700 dark:text-wika-400 font-bold bg-sky-50 dark:bg-sky-950/60 px-1.5 py-0.5 rounded border border-sky-200 dark:border-sky-800 hover:bg-sky-100 transition select-none" title="Otomatis hitung 90 hari kalender dari Tanggal Terima">
+                <input type="checkbox" id="checkAuto90Hari" onchange="toggleAuto90Hari()" class="rounded text-wika-600 focus:ring-wika-500 w-3 h-3">
+                <span>+90 Hari Otomatis</span>
+              </label>
+            </div>
+            <input type="date" id="formKR_tgl_akhir" oninput="handleManualTglAkhirChange()" required class="w-full p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
           </div>
           <div>
             <label class="block font-bold mb-1">Nilai Kontrak (Exc. PPN) *</label>
@@ -2239,6 +2265,51 @@
     // =========================================================================
     // 16. KELOLA FORM DATA KR (INPUT & EDIT)
     // =========================================================================
+    function hitung90HariDari(tglString) {
+      if (!tglString) return '';
+      const parts = tglString.split('-');
+      if (parts.length !== 3) return '';
+      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      if (isNaN(d.getTime())) return '';
+      d.setDate(d.getDate() + 90);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function toggleAuto90Hari() {
+      const isAuto = document.getElementById('checkAuto90Hari').checked;
+      const tglTerima = document.getElementById('formKR_tgl_terima').value;
+      if (isAuto) {
+        if (!tglTerima) {
+          showToast("Silakan tentukan Tanggal Terima terlebih dahulu!", "warning");
+          document.getElementById('checkAuto90Hari').checked = false;
+          return;
+        }
+        const hasilTgl = hitung90HariDari(tglTerima);
+        document.getElementById('formKR_tgl_akhir').value = hasilTgl;
+        showToast(`Tanggal akhir otomatis disetel +90 hari kalender: ${hasilTgl}`, "info");
+      }
+    }
+
+    function handleTanggalTerimaChange() {
+      const isAuto = document.getElementById('checkAuto90Hari')?.checked;
+      if (isAuto) {
+        const tglTerima = document.getElementById('formKR_tgl_terima').value;
+        if (tglTerima) {
+          document.getElementById('formKR_tgl_akhir').value = hitung90HariDari(tglTerima);
+        }
+      }
+    }
+
+    function handleManualTglAkhirChange() {
+      const chk = document.getElementById('checkAuto90Hari');
+      if (chk && chk.checked) {
+        chk.checked = false;
+      }
+    }
+
     function updateDropdownUP3Input(wilayahTerpilih = null, selectedUP3 = null) {
       const wil = wilayahTerpilih || document.getElementById('formKR_wilayah').value;
       const selUP3 = document.getElementById('formKR_up3');
@@ -2267,6 +2338,8 @@
       document.getElementById('formKR_id').value = '';
       document.getElementById('checkEnableTipe2').checked = false;
       document.getElementById('boxFormTipe2').classList.add('hidden');
+      const chk90 = document.getElementById('checkAuto90Hari');
+      if (chk90) chk90.checked = false;
       updateDropdownUP3Input('ACEH');
       document.getElementById('modalFormKR').classList.remove('hidden');
     }
@@ -2284,6 +2357,8 @@
       document.getElementById('formKR_npp').value = item.npp;
       document.getElementById('formKR_tgl_terima').value = item.tgl_terima;
       document.getElementById('formKR_tgl_akhir').value = item.tgl_akhir;
+      const chk90 = document.getElementById('checkAuto90Hari');
+      if (chk90) chk90.checked = false;
       document.getElementById('formKR_nilai_total').value = item.nilai_total;
       document.getElementById('formKR_tipe_1').value = item.tipe_1;
       document.getElementById('formKR_vol_1').value = item.vol_1;
