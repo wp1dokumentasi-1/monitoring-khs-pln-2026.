@@ -347,7 +347,7 @@
             <!-- FOOTER REKAPITULASI TOTAL TABEL KR (UANG & VOLUME SELALU MUNCUL) -->
             <tfoot class="bg-slate-100/90 dark:bg-slate-800/90 border-t-2 border-slate-300 dark:border-slate-700 font-bold">
               <tr>
-                <td colspan="5" class="py-3 px-3 text-right text-slate-600 dark:text-slate-300 uppercase text-[11px]">TOTAL NILAI & VOLUME TERFILTER :</td>
+                <td colspan="5" id="tdFooterLabel" class="py-3 px-3 text-right text-slate-600 dark:text-slate-300 uppercase text-[11px]">TOTAL NILAI & VOLUME TERFILTER :</td>
                 <td class="py-3 px-3 text-right font-mono text-xs text-wika-700 dark:text-wika-400 col-nilai" id="footerTotalNilai">Rp 0</td>
                 <td class="py-3 px-3 text-center col-bayar">-</td>
                 <td class="py-3 px-3 text-center col-tipe">-</td>
@@ -1272,6 +1272,18 @@
           else el.classList.add('hidden');
         });
       });
+
+      // Menyesuaikan colspan label total secara dinamis agar presisi di Mode Viewer & Admin
+      const leadingCols = ["col-wilayah", "col-no_kr", "col-up3", "col-periode", "col-status_kr"];
+      let countLeading = 0;
+      leadingCols.forEach(cid => {
+        let isColShow = isAdmin ? true : (viewerColumnSettings[cid] !== false);
+        if (isColShow) countLeading++;
+      });
+      const tdLabel = document.getElementById('tdFooterLabel');
+      if (tdLabel) {
+        tdLabel.colSpan = countLeading > 0 ? countLeading : 1;
+      }
     }
 
     // =========================================================================
@@ -1556,6 +1568,7 @@
         document.getElementById('footerTotalDeliv').textContent = '0';
         document.getElementById('footerTotalTanam').textContent = '0';
         document.getElementById('footerTotalSisa').textContent = '0';
+        applyColumnVisibility();
         return;
       }
 
